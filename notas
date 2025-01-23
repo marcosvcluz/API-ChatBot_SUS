@@ -1,0 +1,21 @@
+-- Isso mostrará todos os contêineres, incluindo aqueles que não estão em execução.
+-- docker ps -a
+
+-- Iniciar o contêiner:
+-- docker start UBS_ZS
+
+-- Tentar acessar novamente o contêiner:
+-- docker exec -it UBS_ZS /bin/bash
+
+-- Conecte-se ao PostgreSQL
+-- psql -U postgres
+
+-- Liste os bancos de dados
+-- \l
+
+-- Conecte ai banco de dados
+-- \c bot_ubs
+
+
+-- Apresentar as tabelas.
+--bot_ubs=# SELECT * FROM equipe_ubs;
