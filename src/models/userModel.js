@@ -15,15 +15,14 @@ export const getAllUsersService = async (req, res) => {
 };
 
 export const getUserByServiceNumAndCEP = async ( cep, numero) => {
-  
+  console.log(typeof cep, typeof numero);
   try{
       //Consulta no banco de dados
       const result = await pool.query(
         `SELECT cor_equipe FROM equipe_ubs 
         WHERE cep = $1 
-        AND ($2 >= numinic
-        AND $2 <= numfin)`,
-        [cep, numero] // Passando os parâmetros CEP e NUMERO
+        AND ($2 >= numinic AND $2 <= numfin)`,
+        [cep,numero] // Passando os parâmetros CEP e NUMERO
       );
     
       //Se não houver resultados
@@ -40,8 +39,10 @@ export const getUserByServiceNumAndCEP = async ( cep, numero) => {
     }    
 };
 
-export const createUserService = async (logradouro, numero, cep, cor_equipe, latitude, longitude) => {
-
+export const createUserService = async (logradouro, numinic, numfin, cep, cor_equipe, latitude, longitude) => {
+  if (isNaN(cep)){
+    throw new Error ("Erro string");
+  };
   const result = await pool.query(
     "INSERT INTO equipe_ubs(logradouro, numinic, numfin, cep, cor_equipe, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING * ",
     [logradouro, numinic, numfin, cep, cor_equipe, latitude, longitude]
