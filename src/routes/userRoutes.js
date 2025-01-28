@@ -1,15 +1,21 @@
 import express from "express";
-import {getAllUsersService} from "../models/userModel.js";
+import {getAllUsers} from "../controller/userController.js";
 import {getUserByNumAndCEP} from "../controller/userController.js";
 import {createUser} from "../controller/userController.js";
+import {deleteUser} from "../controller/userController.js";
+
+//Usando a funções do models
+import {getAllUsersService} from "../models/userModel.js";
+//import { getUserByServiceNumAndCEP} from "../models/userModel.js"; NÃO DEU CERTO
 import validateUser from "../middlewares/inputValidator.js";
 
 const router = express.Router();
 
 // Rota para buscar a equipe pelo número e CEP
-router.get("/equipe_ubs", getAllUsersService);
-router.get("/equipe_ubs/:cep/:numero",getUserByNumAndCEP);
-router.post("/equipe_ubs", createUser);//preciso olhar para o banco de dados.
+router.get("/equipe_ubs", getAllUsers);
+router.get("/equipe_ubs/:numero/:cep/",getUserByNumAndCEP);
+router.post("/equipe_ubs", createUser);//Rota para criar os usuários
+router.delete("/equipe_ubs/:numinic/:numfin/:cep", deleteUser)
 
 export default router;
 

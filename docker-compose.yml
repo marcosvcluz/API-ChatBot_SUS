@@ -1,0 +1,38 @@
+#version: '3.8'  # Especifique a versão do docker-compose
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env  # Arquivo com as variáveis de ambiente
+    environment:
+      DB_HOST: db  # O nome do serviço 'db' dentro do Docker Compose
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - "${PORT}:${PORT}"  # Mapeando a variável PORT de 5004 para a mesma porta 5004
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db  # O serviço 'app' depende do serviço 'db'
+    volumes:
+      - .:/app
+      # - /app/node_modules
+
+  db:
+    image: postgres:latest  # Usando a imagem mais recente do PostgreSQL
+    env_file:
+      - .env  # Referência ao arquivo .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}  # Nome do banco de dados
+      POSTGRES_USER: ${DB_USER}  # Usuário do banco de dados
+      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Senha do banco de dados
+    ports:
+      - "5433:5432"  # Mapeando a variável DB_PORT de 5433 para a porta 5432 do container
+

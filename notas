@@ -1,5 +1,5 @@
 -- Isso mostrará todos os contêineres, incluindo aqueles que não estão em execução.
--- docker ps -a
+-- docker ps
 
 -- Iniciar o contêiner:
 -- docker start UBS_ZS
