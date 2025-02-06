@@ -19,7 +19,7 @@ export const handleTwilioWebhook = async(req, res) => {
 
     //Extraindo dados do GPS
     const messageBody = recebendoDados.body; // Corpo do SMS
-    const [latitude, longitude] = messageBody.splot(',').map(parseFloat);
+    const [latitude, longitude] = messageBody.split(',').map(parseFloat);
 
     console.log("Latitude:", latitude);
     console.log("Longitude:", longitude);

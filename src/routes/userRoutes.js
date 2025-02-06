@@ -16,6 +16,7 @@ router.post("/equipe_ubs", createUser);//Rota para criar os usuários
 router.delete("/equipe_ubs/:numinic/:numfin/:cep", deleteUser)
 router.put("/equipe_ubs/:id", updateUser);
 
-// Rota para o Twilio webhook
+//Rota para receber POST Twilio
 router.post("/equipe_ubs/twilio-webhook", handleTwilioWebhook);
+
 export default router;

@@ -49,8 +49,10 @@ export const getUserByServiceGPS = async (latitude, longitude) => {
     // Consulta no banco de dados
     const result = await pool.query(
       `SELECT * FROM equipe_ubs
-      WHERE latitude BETWEEN $1 - $3 AND $1 + $3 
-      AND longitude BETWEEN $1 - $3 AND $1 + $3`,
+      WHERE latitude BETWEEN $1::DOUBLE PRECISION - $3::DOUBLE PRECISION 
+      AND $1::DOUBLE PRECISION + $3::DOUBLE PRECISION
+      AND longitude BETWEEN $2::DOUBLE PRECISION - $3::DOUBLE PRECISION 
+      AND $2::DOUBLE PRECISION + $3::DOUBLE PRECISION`,
       [latitude, longitude, margem]
     );
 
