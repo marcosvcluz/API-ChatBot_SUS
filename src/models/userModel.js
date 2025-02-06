@@ -13,7 +13,7 @@ export const getAllUsersService = async (req, res) => {
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 };
-
+//Selecionando a equipe da tabela equipe_ubs com cep e numero do paciente
 export const getUserByServiceNumAndCEP = async ( cep, numero) => {
   console.log(cep, numero);
   try{
@@ -24,8 +24,6 @@ export const getUserByServiceNumAndCEP = async ( cep, numero) => {
         AND ($2 >= numinic AND $2 <= numfin)`,
         [cep,numero] // Passando os parâmetros CEP e NUMERO
       );
-
-      console.log('Cor da equipe', result);
     
       //Se não houver resultados
       if(result.rows.length === 0){
@@ -42,40 +40,34 @@ export const getUserByServiceNumAndCEP = async ( cep, numero) => {
     }    
 };
 
-
-//TRABALHAR NESSA FUNÇÃO*******************(1)
-/*   1) RESEARCH geospatial queries function -> ST_Distance
-/*   2) ALTERAR O BANCO DE DADOS
-/*   3) FUNÇÃO PARADA MOMENTANEAMENTE 
-
-
-export const getUserByServiceGPS = async(latitude, longitude) =>{
-  console.log(typeof latitude, typeof longitude, typeof radius);
+//Selecionando a equipe da tabela equipe_ubs com GPS
+export const getUserByServiceGPS = async (latitude, longitude) => {
   try{
-      //Consulta no banco de dados
-      const result = await pool.query(
-        `SELECT cor_equipe FROM equipe_ubs 
-        WHERE latitude = $1 
-        AND longitude = $2,
-        [latitude, longitude]` // Passando os parâmetros latitude e longitude
-      );
-    
-      //Se não houver resultados
-      if(result.rows.length === 0){
-        console.log("Equipe não encontrada", );
-        return null;
-      }
+    //Margem de erro de distância de GPS ajustada em  110 metros
+    const margem = 0.001;
 
-      //Se houver resultadosretorna a cor da equipe
-      return result.rows[0].cor_equipe;
-    } catch (error) {
-      console.error("Erro ao acessar o banco de dados", error);
-      throw error;
-    }  
-}
-**/
+    // Consulta no banco de dados
+    const result = await pool.query(
+      `SELECT * FROM equipe_ubs
+      WHERE latitude BETWEEN $1 - $3 AND $1 + $3 
+      AND longitude BETWEEN $1 - $3 AND $1 + $3`,
+      [latitude, longitude, margem]
+    );
 
+    //Retornando caso equipe não encontrada
+    if (result.rows.length === 0) {
+      console.log("Equipe não encontrada no banco de dados.");
+      return null;
+    }
+    return result.rows[0].cor_equipe;
+  }
+  catch(error) {
+    console.error("Erro ao acessar o banco de dados", error);
+    throw error;
+  }
+};
 
+// Creando um novo usuário na tabela do banco de dados
 export const createUserService = async (logradouro, numinic, numfin, cep, cor_equipe, latitude, longitude) => {
   if (isNaN(cep)){
     throw new Error ("Erro string");
@@ -88,7 +80,7 @@ export const createUserService = async (logradouro, numinic, numfin, cep, cor_eq
 };
 
 
-//TRABALHAR NESSA FUNÇÃO*******************(2)
+//Deletando equipe do banco de dados com numero inicial, numero final e cep.
 export const deleteUserService = async (numeroInicial, numeroFinal, cep) => {
   try{
     console.log(`Deletar objeto cor de equipe com os parâmetros 1° numero inicial, 2° numero final and 3° cep ${numeroInicial}, ${numeroFinal}, ${cep}`);
@@ -105,9 +97,7 @@ export const deleteUserService = async (numeroInicial, numeroFinal, cep) => {
     }
     console.log(`Resultado: ${JSON.stringify(result.rows[0])}`);
     return result.rows[0];
-
   } 
-  
   catch (error)
   {
     console.error("Erro cor de equipe não encontrada no banco de dados", error);
@@ -115,7 +105,37 @@ export const deleteUserService = async (numeroInicial, numeroFinal, cep) => {
   }    
 };
 
-//TRABALHAR NESSA FUNÇÃO*******************(3)
-export const updateUserService = async (req, res, next) => {
-
-}
+// Atualizando os dados da equipe através do ID.
+export const updateUserService = async (req, res) => 
+{
+  try{
+      
+      const {id} = req.params;
+      
+      if(!id)
+      {
+        throw new Error("ID da equipe não fornecida!");
+      }
+        
+      const { logradouro, numinic, numfin, cep, cor_equipe, latitude, longitude } = req.body;
+      
+      const result = await pool.query
+      (
+        
+        "UPDATE equipe_ubs SET logradouro = $2, numinic = $3, numfin=$4, cep = $5, cor_equipe = $6, latitude = $7, longitude = $8 WHERE id = $1 RETURNING *",
+        [id, logradouro, numinic, numfin, cep, cor_equipe, latitude,  longitude]
+      );
+      
+      if (result.rowCount === 0)
+      {
+        return res.status(404).json({ message: "Usuário não encontrado." });
+      }
+      
+      return res.status(200).json(result.rows[0]);
+  }
+  catch(err)
+  {
+    console.error.apply("Erro de updanting para equipe:", err);
+    throw err;
+  }
+};

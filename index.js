@@ -6,6 +6,7 @@ import userRoutes from "./src/routes/userRoutes.js";
 import errorHandling from "./src/middlewares/errorHandler.js";
 import bodyParser from 'body-parser';
 
+
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,13 @@ app.use("/user", userRoutes); // verifique se a base de /use está configurada
 
 // Error handling middleware
 app.use(errorHandling);
+
+//Preciso trabalhar nessa função.
+// app.post('/user/equipe_ubs/twilio-webhoo', (req, res) => {
+  
+// })
+
+
 
 //Testing POSTGRES Connection
 app.get("/", async (req, res) => {
